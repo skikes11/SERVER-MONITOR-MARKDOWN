@@ -247,6 +247,88 @@ Tiếp tục vào Dashboard => Import
 ![Prometheus](https://images.viblo.asia/80a4ce6d-2728-45e2-9c16-94e9c76a402d.png)
 Sau đó giao diện dashboard vừa được import sẽ xuất hiện
 
+#### Cấu hình cảnh báo, các lỗi nghiêm trọng, sự cố,... gửi qua Slack (Grafana)
+
+
+**Tạo app slack và lấy webhook URL**
+Vào trang web của slack để tạo app [tại đây](https://api.slack.com/apps?new_app=1)
+
+![Prometheus](https://images.ctfassets.net/vtn4rfaw6n2j/15EXMuNsRULqwybJLWq2It/59018eccb578303ed173445b209689b1/image2.png?fm=webp&q=85)
+
+![Prometheus](https://i.im.ge/2022/09/07/OKZvbr.Screenshot-from-2022-09-07-15-06-57.png)
+Sau khi tạo xong app sẽ xuất hiện giao diện như sau, copy Webhook URL
+
+**Tạo contact points trong Alert Grafana**
+Vào Grafana, chọn Alert(hình cái chuông) bên side bar
+
+Chọn Contact point => Add new contact points 
+![Prometheus](https://images.ctfassets.net/vtn4rfaw6n2j/599jZHlbsKFpzdBI2H3QBc/f8856be6fc14afdd93d11bc8aea18ad3/image9.png?fm=webp&q=85)
+
+Chọn contact point type => slack 
+Dán Webhook URL được copy ở trên vào 
+![Prometheus](https://i.im.ge/2022/09/07/OKK0pC.Screenshot-from-2022-09-07-15-14-52.png)
+
+Click Test ở góc bên phải để kiểm tra xem Grafana đã kết nối với Slack chưa
+![Prometheus](https://i.im.ge/2022/09/07/OKfSWX.Screenshot-from-2022-09-07-15-21-22.png)
+Nếu hiện tin nhắn như vậy thì đã kết nối thành công sau đó hãy lưu lại
+
+![Prometheus](https://i.im.ge/2022/09/07/OKfQTa.Screenshot-from-2022-09-07-15-17-33.png)
+Sau khi lưu lại
+
+**Tạo Alert Rules**
+
+Chọn vào Alert Rules trong Alerting => Add New Alert rule
+
+![Prometheus](https://i.im.ge/2022/09/07/OKkteh.Screenshot-from-2022-09-07-15-38-33.png)
+Tạo query
+- Metric sẽ là những thông số được lấy ra từ data của Prometheus 
+- Labels sẽ là những cặp giá trị chính và có thể được định nghĩa là bất kỳ thứ gì! có thể gọi chúng là siêu dữ liệu để mô tả luồng nhật ký
+
+Tạo Expression
+- Operation là kiểu điều kiện mà người dùng muốn để bắt cảnh báo 
+- Với kiểu sử dụng Classic condition sẽ là loại sử dụng điều kiện cơ bản như lớn hơn, bé hơn, bằng...
+
+Đồ thị hiển thị
+- Màu xanh cây thể hiện những thông số theo câu lệnh query
+- Màu đỏ thể hiện phần giá trị điều kiện 
+
+Khi nào thì cảnh báo
+- Tùy theo câu lệnh điều kiện, ở đây sử dụng IS ABOVE có nghĩa là khi mà đường màu xanh vượt lên trên đường màu đỏ thì sẽ có cảnh báo 
+
+![Prometheus](https://i.im.ge/2022/09/07/OKHCO4.Screenshot-from-2022-09-07-15-58-39.png)
+Thêm những thông tin cần thiết, sau đó lưu lại 
+
+
+Mở một số ứng dụng hoặc chạy vòng lặp trong terminal để kiểm tra trường hợp cảnh báo có gửi tin nhắn về slack
+![Prometheus](https://i.im.ge/2022/09/07/OKHqTG.Screenshot-from-2022-09-07-15-53-06.png)
+Ở đây tin nhắn đã gửi về thành công
+
+**Tạo Alert Rules cho CPU load, RAM used, Disk space used nếu lớn hơn 90%
+
+Ở dashboard Node Exporter full mà mình đã thêm ở phía trên thì sẽ có những giao diện hiển thị thông tin cần thiết như CPU Busy, Ram Used, Disk Space Used Basic...
+Nếu cần câu lệnh query nào chỉ cần click vào và chọn explore để lấy query 
+![Prometheus](https://i.im.ge/2022/09/07/OKptex.Screenshot-from-2022-09-07-16-08-10.png)
+Ở đây gồm câu lệnh query của CPU Busy và biểu đồ hiển thị, copy câu lệnh để dùng cho alerting
+
+Tương tự, tạo thêm 1 Alert rule sau đó chọn phần Code và dán vào phần code query copy phía trên
+![Prometheus](https://i.im.ge/2022/09/07/OKvJty.Screenshot-from-2022-09-07-16-11-01.png)
+Biểu đồ thể hiện tham số CPU Load ứng với thời gian thực sẽ được xuất hiện bên dưới
+Sau đó tạo điều kiện để cảnh báo, ở đây là khi CPU Load lớn hơn 90%
+Sau đó thêm một số thông tin như tên, tin nhắn gửi đi, có thể là các key value bất kì và lưu lại
+Vậy là đã hoàn thành phần cảnh báo cho CPU Load 
+=> thực hiện tương tự với RAM used và Disk space used 
+
+![Prometheus](https://i.im.ge/2022/09/07/OKnmVD.Screenshot-from-2022-09-07-16-16-16.png)
+
+
+
+
+
+
+
+
+
+
 
 
 
