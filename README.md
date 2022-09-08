@@ -319,6 +319,7 @@ Sau đó kiểm tra trường hợp cảnh báo có gửi tin nhắn về slack
 **Tạo Alert Rules cho CPU load, RAM used, Disk space used nếu lớn hơn 90%
 
 Ở dashboard Node Exporter full mà mình đã thêm ở phía trên thì sẽ có những giao diện hiển thị thông tin cần thiết như CPU Busy, Ram Used, Disk Space Used Basic...
+
 Nếu cần câu lệnh query nào chỉ cần click vào và chọn explore để lấy query 
 ![Prometheus](https://i.ibb.co/5xsTtYV/Screenshot-from-2022-09-07-16-08-10.png)
 
