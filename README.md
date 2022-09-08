@@ -316,7 +316,7 @@ Sau đó kiểm tra trường hợp cảnh báo có gửi tin nhắn về slack
 
 Ở đây tin nhắn cảnh báo đã gửi về thành công
 
-**Tạo Alert Rules cho CPU load, RAM used, Disk space used nếu lớn hơn 90%
+**Tạo Alert Rules cho CPU load, RAM used, Disk space used nếu lớn hơn 90%**
 
 Ở dashboard Node Exporter full mà mình đã thêm ở phía trên thì sẽ có những giao diện hiển thị thông tin cần thiết như CPU Busy, Ram Used, Disk Space Used Basic...
 
