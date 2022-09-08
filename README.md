@@ -256,6 +256,7 @@ Vào trang web của slack để tạo app [tại đây](https://api.slack.com/a
 ![Prometheus](https://images.ctfassets.net/vtn4rfaw6n2j/15EXMuNsRULqwybJLWq2It/59018eccb578303ed173445b209689b1/image2.png?fm=webp&q=85)
 
 ![Prometheus](https://i.ibb.co/Fsqyg2n/Screenshot-from-2022-09-07-15-06-57.png)
+
 Sau khi tạo xong app sẽ xuất hiện giao diện như sau, copy Webhook URL
 
 **Tạo contact points trong Alert Grafana**
