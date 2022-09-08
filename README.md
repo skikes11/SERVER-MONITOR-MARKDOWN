@@ -309,8 +309,8 @@ Khi nào thì cảnh báo
 Thêm những thông tin cần thiết, sau đó lưu lại 
 
 
-Mở một số ứng dụng hoặc chạy vòng lặp trong terminal để khiến tham số  node_load1 thay đổi
-sau đó kiểm tra trường hợp cảnh báo có gửi tin nhắn về slack
+Mở một số ứng dụng hoặc chạy vòng lặp trong terminal để khiến tham số  node_load1 thay đổi.
+Sau đó kiểm tra trường hợp cảnh báo có gửi tin nhắn về slack
 
 ![Prometheus](https://i.ibb.co/mXYSHR4/Screenshot-from-2022-09-07-15-53-06.png)
 
