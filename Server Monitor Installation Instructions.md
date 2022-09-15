@@ -316,9 +316,10 @@ Sau đó kiểm tra trường hợp cảnh báo có gửi tin nhắn về slack
 
 Ở đây tin nhắn cảnh báo đã gửi về thành công
 
-**Tạo Alert Rules cho CPU load, RAM used, Disk space used nếu lớn hơn 90%
+**Tạo Alert Rules cho CPU load, RAM used, Disk space used nếu lớn hơn 90%**
 
 Ở dashboard Node Exporter full mà mình đã thêm ở phía trên thì sẽ có những giao diện hiển thị thông tin cần thiết như CPU Busy, Ram Used, Disk Space Used Basic...
+
 Nếu cần câu lệnh query nào chỉ cần click vào và chọn explore để lấy query 
 ![Prometheus](https://i.ibb.co/5xsTtYV/Screenshot-from-2022-09-07-16-08-10.png)
 
@@ -334,6 +335,188 @@ Vậy là đã hoàn thành phần cảnh báo cho CPU Load
 => thực hiện tương tự với RAM used và Disk space used 
 
 ![Prometheus](https://i.ibb.co/7Qp3dTt/Screenshot-from-2022-09-07-16-16-16.png)
+
+#### Cài đặt và cấu hình loki services và promtail services để đọc và trình bày file log lên dashboard grafana
+
+**Cài đặt Grafana Loki**
+
+Tải file zip và giải nén 
+
+```sh
+wget https://github.com/grafana/loki/releases/download/v2.4.2/loki-linux-amd64.zip 
+
+unzip loki-linux-amd64.zip
+```
+
+Chuyển file vừa giải nén sang thư mục usr/local/bin
+```sh
+sudo mv loki-linux-amd64 /usr/local/bin/loki
+```
+
+Tạo các thư mục cấu hình
+```sh
+sudo mkdir /etc/loki
+
+sudo mkdir -p /data/loki
+```
+
+Cấu hình file config 
+```sh
+sudo nano /etc/loki-local-config.yaml
+```
+
+Dán đoạn phía dưới vào file và lưu lại 
+```sh
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+ingester:
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
+  max_transfer_retries: 0
+
+schema_config:
+  configs:
+    - from: 2018-04-15
+      store: boltdb
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 168h
+
+storage_config:
+  boltdb:
+    directory: /data/loki/index
+
+  filesystem:
+    directory: /data/loki/chunks
+
+limits_config:
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+chunk_store_config:
+  max_look_back_period: 0s
+
+table_manager:
+  retention_deletes_enabled: false
+  retention_period: 0s
+```
+
+Tạo file loki services và dán đoạn phía dưới vào 
+```sh
+sudo nano /etc/systemd/system/loki.service
+
+[Unit]
+Description=Loki service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/loki -config.file /etc/loki-local-config.yaml
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Reload deamon và khởi động loki services
+
+```sh
+sudo systemctl daemon-reload
+
+sudo systemctl start loki
+```
+
+Kiểm tra trạng thái của loki services
+```sh
+sudo systemctl status loki
+```
+
+**Cài đặt Promtail**
+
+Cài đặt và giải nén file 
+
+```sh
+curl -LO https://github.com/grafana/loki/releases/download/v2.4.2/promtail-linux-amd64.zip
+
+unzip promtail-linux-amd64.zip
+```
+
+Di chuyển file vừa giải nén sang thư mục /usr/local/bin
+```sh
+sudo mv promtail-linux-amd64 /usr/local/bin/promtail
+```
+
+Tạo file config và dán đoạn text phía dưới vào 
+
+```sh
+sudo nano /etc/promtail-local-config.yaml
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /data/loki/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
+```
+Ở mặc định jobs cơ bản sẽ là varlogs và path sẽ dẫn đến file log của hệ thống máy tính (/var/log)
+
+Tạo file protail services và dán đoạn text phía dưới vào
+```sh
+sudo tee /etc/systemd/system/promtail.service
+
+[Unit]
+Description=Promtail service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/promtail -config.file /etc/promtail-local-config.yaml
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Khởi động services và kiểm tra trạng thái 
+
+```sh
+sudo systemctl daemon-reload
+
+sudo systemctl start promtail.service
+
+systemctl status promtail.service
+```
+
+Sau đó vào Grafana => Datasource => Add Datasource Loki để sử dụng
+
+
+
+
 
 
 
